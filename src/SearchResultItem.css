@@ -1,0 +1,30 @@
+.searchResultItem {
+    align-items: center;
+    margin: 5px 0;
+    margin-bottom: 50px;
+    display: flex;
+    flex-direction: column;
+}
+
+.searchResultItem:last-child {
+    margin-bottom: 5px;
+}
+
+.itemLocation {
+    font-size: 17px;
+    font-family: 'Proxima Nova Bold';
+    margin-bottom: 5px;
+}
+
+.itemLabel {
+    font-size: 16px;
+    font-family: 'Proxima Nova Light';
+}
+
+.itemLabel div {
+    display: inline-block;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    font-family: 'FontAwesome Regular';
+}

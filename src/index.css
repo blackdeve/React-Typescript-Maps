@@ -1,0 +1,29 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+}
+
+
+/* Custom Fonts */
+
+@font-face {
+    font-family: 'Proxima Nova Light';
+    font-style: normal;
+    font-weight: 400;
+    src: url('./fonts/Proxima\ Nova\ Light.otf');
+}
+
+@font-face {
+    font-family: 'Proxima Nova Bold';
+    font-style: normal;
+    font-weight: 400;
+    src: url('./fonts/Proxima\ Nova\ Bold.otf');
+}
+
+@font-face {
+    font-family: 'FontAwesome Regular';
+    font-style: normal;
+    font-weight: 400;
+    src: url('./fonts/fontawesome-pro-regular-400.ttf');
+}
