@@ -1,60 +1,10 @@
 import * as React from 'react';
 import './App.css';
 
+import * as firebase from "./firebase";
+
 import CustomGoogleMap from './CustomGoogleMap';
 import SearchResultItem from './SearchResultItem';
-
-const dummyData = [
-  {
-    geocode: { lat: 49.247402, lng: -123.167404 },
-    location: 'Locaion 1',
-    address: 'Address 1',
-    email: 'Email 1',
-    phone: 'Phone Number 1'
-  },
-  {
-    geocode: { lat: 49.193881, lng: -123.099359 },
-    location: 'Locaion 2',
-    address: 'Address 2',
-    email: 'Email 2',
-    phone: 'Phone Number 2'
-  },
-  {
-    geocode: { lat: 49.272727, lng: -123.052634 },
-    location: 'Locaion 3',
-    address: 'Address 3',
-    email: 'Email 3',
-    phone: 'Phone Number 3'
-  },
-  {
-    geocode: { lat: 49.238247, lng: -123.044633 },
-    location: 'Locaion 4',
-    address: 'Address 4',
-    email: 'Email 4',
-    phone: 'Phone Number 4'
-  },
-  {
-    geocode: { lat: 49.257072, lng: -123.108163 },
-    location: 'Locaion 5',
-    address: 'Address 5',
-    email: 'Email 5',
-    phone: 'Phone Number 5'
-  },
-  // {
-  //   geocode: { lat: 49.246936, lng: -123.143338 },
-  //   location: 'Locaion 6',
-  //   address: 'Address 6',
-  //   email: 'Email 6',
-  //   phone: 'Phone Number 6'
-  // },
-  // {
-  //   geocode: { lat: 49.231874, lng: -123.102442 },
-  //   location: 'Locaion 7',
-  //   address: 'Address 7',
-  //   email: 'Email 7',
-  //   phone: 'Phone Number 7'
-  // }
-]
 
 const distance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
   var radlat1 = Math.PI * lat1 / 180
@@ -80,8 +30,23 @@ class App extends React.Component<any, any> {
     super(props);
 
     this.state = {
-      results: dummyData
+      shopData: [],
+      results: []
     }
+
+    this.loadDataFromFirebase();
+  }
+
+  loadDataFromFirebase() {
+    firebase.db.ref().child('shops').once('value')
+    .then(res => {
+      let shopData = res.val();
+      const list: any = [];
+      for (var key in shopData) {
+        list.push(shopData[key]);
+      }
+      this.setState({shopData: list, results: list})
+    })
   }
 
   onZipcodeChangeHandler(e: any) {
@@ -94,6 +59,8 @@ class App extends React.Component<any, any> {
     const zip = this.zipInput.value;
     const radius = this.radiusInput.value;
 
+    const { shopData } = this.state;
+
     var lat: any;
     var lng: any;
     var address = zip;
@@ -105,8 +72,8 @@ class App extends React.Component<any, any> {
         
         const searchResults:any = [];
 
-        dummyData.map((item: any) => {
-          let dist:any = distance(lat, lng, item.geocode.lat, item.geocode.lng);
+        shopData.map((item: any) => {
+          let dist:any = distance(lat, lng, item.latlng.lat, item.latlng.lng);
           if (dist <= radius) {
             searchResults.push(item);
           }
@@ -137,7 +104,7 @@ class App extends React.Component<any, any> {
               <CustomGoogleMap
                 defaultZoom={11}
                 defaultCenter={{ lat: 49.267984, lng: - 123.112960 }}
-                markers={this.state.results.map((item:any) => item.geocode)}
+                markers={this.state.results.map((item:any) => item.latlng)}
               />
             </div>
             <div className="filter">

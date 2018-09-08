@@ -2,7 +2,6 @@ import * as React from 'react';
 import './CustomGoogleMap.css';
 
 import {GoogleMap, Marker, withGoogleMap, withScriptjs} from 'react-google-maps';
-// import markerSvg from './marker.svg';
 
 let defaultZoom = 10;
 let defaultCenter = { lat: -34.397, lng: 150.644 };
@@ -45,9 +44,6 @@ class CustomGoogleMap extends React.Component<any, any> {
               return (
                 <Marker
                   key={idx}
-                  // icon={{
-                  //   url: markerSvg
-                  // }}
                   position={marker}
                 />
               )
