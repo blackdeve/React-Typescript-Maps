@@ -1,85 +1,95 @@
-import * as React from 'react';
-import './App.css';
+import * as React from "react";
 
 import * as firebase from "./firebase";
+import CustomGoogleMap from "./CustomGoogleMap";
+import SearchResultItem from "./SearchResultItem";
+import { LatLng, Item } from './interface';
 
-import CustomGoogleMap from './CustomGoogleMap';
-import SearchResultItem from './SearchResultItem';
+import "./App.css";
 
 const distance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
-  var radlat1 = Math.PI * lat1 / 180
-  var radlat2 = Math.PI * lat2 / 180
-  var theta = lon1 - lon2
-  var radtheta = Math.PI * theta / 180
-  var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+  const radlat1 = Math.PI * lat1 / 180;
+  const radlat2 = Math.PI * lat2 / 180;
+  const theta = lon1 - lon2;
+  const radtheta = Math.PI * theta / 180;
+  let dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
   if (dist > 1) {
     dist = 1;
   }
-  dist = Math.acos(dist)
-  dist = dist * 180 / Math.PI
-  dist = dist * 60 * 1.1515
+  dist = Math.acos(dist);
+  dist = dist * 180 / Math.PI;
+  dist = dist * 60 * 1.1515;
   dist = dist * 1.609344; // for kilometers
-  return dist
+  
+  return dist;
 }
 
-class App extends React.Component<any, any> {
-  zipInput: any;
-  radiusInput: any;
+interface State {
+  results: object[],
+  shopData: object[],
+}
 
-  constructor(props: any) {
+const tempArray = new Array(100).fill(null);
+
+export default class App extends React.Component<object, State> {
+  radiusInput: HTMLSelectElement;
+  zipInput: HTMLInputElement;
+
+  constructor(props: object) {
     super(props);
 
     this.state = {
-      shopData: [],
-      results: []
-    }
+      results: [],
+      shopData: []
+    };
 
     this.loadDataFromFirebase();
   }
 
-  loadDataFromFirebase() {
-    firebase.db.ref().child('shops').once('value')
-    .then(res => {
-      let shopData = res.val();
-      const list: any = [];
-      for (var key in shopData) {
-        list.push(shopData[key]);
-      }
-      this.setState({shopData: list, results: list})
-    })
-  }
-
-  onZipcodeChangeHandler(e: any) {
-    const zipcode = e.target.value;
-    this.setState({ zipcode });
+  private async loadDataFromFirebase() {
+    const res = await firebase.db.ref().child("shops").once("value");
+    let shopData = res.val();
+    let list: object[] = [];
+    for (let key in shopData) {
+        list.push(shopData[key] as object);
+    }
+    this.setState({shopData: list});
   }
   
-  applyFilter() {
-    let THAT: any = this;
+  private applyFilter() {
+    const radius:number = parseInt(this.radiusInput.value);
     const zip = this.zipInput.value;
-    const radius = this.radiusInput.value;
+
+    if (zip.length === 0) {
+      alert("Zip / Postal Code can't be blank");
+      return;
+    }
 
     const { shopData } = this.state;
 
-    var lat: any;
-    var lng: any;
-    var address = zip;
-    var geocoder: any = new google.maps.Geocoder();
-    geocoder.geocode( {'address': address}, function(results: any, status: any) {
-      if (status == google.maps.GeocoderStatus.OK) {
+    let lat: number;
+    let lng: number;
+    const address = zip;
+    const geocoder: google.maps.Geocoder = new google.maps.Geocoder();
+    geocoder.geocode( {"address": address}, (results: {geometry: {location: {lat: Function, lng: Function}}}[], status: number) => {
+      if (status === google.maps.GeocoderStatus.OK) {
         lat = parseFloat(results[0].geometry.location.lat());
         lng = parseFloat(results[0].geometry.location.lng());
         
-        const searchResults:any = [];
+        let searchResults:object[] = [];
 
-        shopData.map((item: any) => {
-          let dist:any = distance(lat, lng, item.latlng.lat, item.latlng.lng);
-          if (dist <= radius) {
-            searchResults.push(item);
-          }
-        })
+        if (shopData) {
+          shopData.map((item: {latlng: LatLng}) => {
+            let dist:number = distance(lat, lng, item.latlng.lat, item.latlng.lng);
+            if (dist <= radius) {
+              if (searchResults !== undefined) {
+                searchResults.push(item);
+              }
+            }
+          });
+        }
 
-        THAT.setState({ results: searchResults });
+        this.setState({ results: searchResults });
       } else {
         alert("Geocode was not successful for the following reason: " + status);
       }
@@ -87,14 +97,13 @@ class App extends React.Component<any, any> {
   }
 
   public render() {
-    const first: any = [];
-    const second: any = [];
-    const third: any = [];
-    const results: any = this.state.results;
+    const columns: object[][] = [[], [], []];
+    const results = this.state.results;
     let i: number;
-    for (i = 0; i < results.length; i += 3) first.push(results[i])
-    for (i = 1; i < results.length; i += 3) second.push(results[i])
-    for (i = 2; i < results.length; i += 3) third.push(results[i])
+    let j: number;
+    for (i = 0; i < 3; i ++) {
+      for (j = i; j < results.length; j += 3) columns[i].push(results[j]);
+    }
 
     return (
       <div className="App">
@@ -104,74 +113,58 @@ class App extends React.Component<any, any> {
               <CustomGoogleMap
                 defaultZoom={11}
                 defaultCenter={{ lat: 49.267984, lng: - 123.112960 }}
-                markers={this.state.results.map((item:any) => item.latlng)}
+                markers={this.state.results ? this.state.results.map((item:{latlng: LatLng}) => item.latlng) : []}
               />
             </div>
             <div className="filter">
-              <div className="halfside">
+              <div className="filterInputContainer">
                 <span className="filterName">ZIP CODE / POSTAL CODE</span>
-                <input ref={r => this.zipInput = r} className="filterInput" type="text" name="radius" id="zip" />
-                <span className="filterLabel" onClick={this.applyFilter.bind(this)}>Search Results</span>
+                <input ref={(r) => this.zipInput = r as HTMLInputElement} className="filterInput" type="text" name="radius" id="zip" />
+                <span className="filterLabel">Search Results</span>
               </div>
-              <div className="halfside">
+              <div className="filterInputContainer">
                 <span className="filterName">SELECT RADIUS</span>
-                <select ref={r => this.radiusInput = r} className="filterInput" name="radius" id="radius">
+                <select ref={(r) => this.radiusInput = r as HTMLSelectElement} className="filterInput" name="radius" id="radius">
                   <option value="9999999">No Limit</option>
                   {
-                    new Array(100).fill(null).map((item:any, idx:any) => (
+                    tempArray.map((item:object, idx:number) => (
                       <option key={idx} value={`${idx+1}`}>{idx + 1} km</option>
                     ))
                   }
                 </select>
               </div>
+              <div className="searchButtonContainer">
+                <div className="searchButton" onClick={this.applyFilter.bind(this)}>Search</div>
+              </div>
             </div>
           </div>
 
           <div className="searchResults">
-            <div className="listColumn">
-              {
-                first.map((item: any, idx: any) => 
-                  <SearchResultItem
-                    key={idx}
-                    location={item.location}
-                    address={item.address}
-                    email={item.email}
-                    phone={item.phone}
-                  />
-                )
-              }
-            </div>
-            <div className="listColumn">
-              {
-                second.map((item: any, idx: any) =>
-                  <SearchResultItem
-                    key={idx}
-                    location={item.location}
-                    address={item.address}
-                    email={item.email}
-                    phone={item.phone}
-                  />
-                )
-              }
-            </div>
-            <div className="listColumn">
-              {
-                third.map((item: any, idx: any) =>
-                  <SearchResultItem
-                    key={idx}
-                    location={item.location}
-                    address={item.address}
-                    email={item.email}
-                    phone={item.phone}
-                  />
-                )
-              }
-            </div>
+            {
+              results.length !== 0 ?
+              columns.map((column: [], idx1: number) => (
+                <div key={idx1} className={`listColumn${column.length === 0 ? " emptyColumn" : ""}`}>
+                  {
+                    column.map((item: Item, idx: number) => (
+                      <SearchResultItem
+                        key={idx}
+                        location={item.location}
+                        address={item.address}
+                        email={item.email}
+                        phone={item.phone}
+                      />
+                    ))
+                  }
+                </div>
+              ))
+              :
+              <div className="noLocationMsg">
+                No locations available
+              </div>
+            }
           </div>
         </div>
       </div>
     );
   }
 }
-
-export default App;

@@ -1,64 +1,92 @@
 .App {
-    width: 100%;
-    height: 100vh;
+  width: 100%;
+  height: 100vh;
 }
 
 .container {
-    width: 750px;
-    margin: auto;
+  width: 750px;
+  margin: auto;
 }
 
 .mapContainer {
-    border: 1px solid #DDD;
-    border-radius: 15px;
-    overflow: hidden;
+  border: 1px solid #DDD;
+  border-radius: 15px;
+  overflow: hidden;
 }
 
 .map {
-    height: 380px;
+  height: 380px;
 }
 
 .filter {
-    border-top: 1px solid #DDD;
-    display: flex;
-    justify-content: space-around;
-    padding: 20px 0;
+  border-top: 1px solid #DDD;
+  display: flex;
+  justify-content: space-around;
+  padding: 20px 0;
 }
 
-.halfside {
-    width: 36%;
+.filterInputContainer {
+  width: 32%;
+}
+
+.searchButtonContainer {
+  width: 12%;
+  display: flex;
+  align-items: center;
+}
+
+.searchButton {
+  width: 100%;
+  height: 25px;
+  background: rgb(241, 244, 246);
+  border: 1px solid #DDD;
+  border-radius: 5px;
+  text-align: center;
+  line-height: 25px;
+  cursor: pointer;
+  font-family: "Proxima Nova Light";
 }
 
 .filterName {
-    font-size: 18px;
-    font-weight: bold;
-    font-family: 'Proxima Nova Bold';
+  font-size: 18px;
+  font-weight: bold;
+  font-family: "Proxima Nova Bold";
 }
 
 .filterInput {
-    margin: 15px 0;
-    width: 100%;
-    height: 45px;
-    background: rgb(241, 244, 246);
-    border: 1px solid #DDD;
-    border-radius: 5px;
-    font-size: 25px;
-    font-family: 'Proxima Nova Light'
+  margin: 15px 0;
+  width: 100%;
+  height: 45px;
+  background: rgb(241, 244, 246);
+  border: 1px solid #DDD;
+  border-radius: 5px;
+  font-size: 25px;
+  font-family: "Proxima Nova Light"
 }
 
 .filterLabel {
-    font-family: 'Proxima Nova Light';
+  font-family: "Proxima Nova Light";
 }
 
 .searchResults {
-    margin: 50px -10px;
-    display: flex;
+  margin: 50px -10px;
+  display: flex;
 }
 
 .listColumn {
-    flex: 1;
+  flex: 1;
 }
 
 .listColumn:nth-child(-n+2) {
-    border-right: 1px solid #DDD;
+  border-right: 1px solid #DDD;
+}
+
+.emptyColumn {
+  border-right: none !important;
+}
+
+.noLocationMsg {
+  margin: auto;
+  font-size: 30px;
+  font-family: "Proxima Nova Bold";
 }
