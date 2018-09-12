@@ -7,21 +7,23 @@ import { LatLng, Item } from './interface';
 
 import "./App.css";
 
+const degreesToRadians = (degrees:number) =>  {
+  return degrees * Math.PI / 180;
+}
+
 const distance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
-  const radlat1 = Math.PI * lat1 / 180;
-  const radlat2 = Math.PI * lat2 / 180;
-  const theta = lon1 - lon2;
-  const radtheta = Math.PI * theta / 180;
-  let dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
-  if (dist > 1) {
-    dist = 1;
-  }
-  dist = Math.acos(dist);
-  dist = dist * 180 / Math.PI;
-  dist = dist * 60 * 1.1515;
-  dist = dist * 1.609344; // for kilometers
-  
-  return dist;
+  const earthRadiusKm = 6371;
+
+  const dLat = degreesToRadians(lat2-lat1);
+  const dLon = degreesToRadians(lon2-lon1);
+
+  lat1 = degreesToRadians(lat1);
+  lat2 = degreesToRadians(lat2);
+
+  let a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+          Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1) * Math.cos(lat2); 
+  let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return earthRadiusKm * c;
 }
 
 interface State {
