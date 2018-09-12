@@ -4,7 +4,7 @@
 }
 
 .container {
-  width: 750px;
+  max-width: 750px;
   margin: auto;
 }
 
@@ -64,11 +64,27 @@
   font-family: "Proxima Nova Light"
 }
 
-.filterLabel {
+.filterLabel1 {
   font-family: "Proxima Nova Light";
 }
 
-.searchResults {
+.filterLabel2 {
+  font-family: "Proxima Nova Light";
+  margin: 10px 0;
+  display: none;
+}
+
+.searchResults-1 {
+  margin: 50px -10px;
+  display: none;
+}
+
+.searchResults-2 {
+  margin: 50px -10px;
+  display: none;
+}
+
+.searchResults-3 {
   margin: 50px -10px;
   display: flex;
 }
@@ -77,8 +93,12 @@
   flex: 1;
 }
 
-.listColumn:nth-child(-n+2) {
+.listColumn {
   border-right: 1px solid #DDD;
+}
+
+.listColumn:last-child {
+  border-right: none;
 }
 
 .emptyColumn {
@@ -89,4 +109,42 @@
   margin: auto;
   font-size: 30px;
   font-family: "Proxima Nova Bold";
+}
+
+@media only screen and (max-width: 576px) {
+  .filter {
+    flex-direction: column;
+    align-items: center;
+  }
+  .filterInputContainer {
+    width: 60%;
+    min-width: 220px;
+  }
+  .filterLabel1 {
+    display: none;
+  }
+  .filterLabel2 {
+    display: block;
+  }
+  .searchButtonContainer {
+    width: 20%;
+    min-width: 70px;
+    display: flex;
+    align-items: center;
+  }
+  .searchResults-2 {
+    display: flex;
+  }
+  .searchResults-3 {
+    display: none;
+  }
+}
+
+@media only screen and (max-width: 450px) {
+  .searchResults-1 {
+    display: flex;
+  }
+  .searchResults-2 {
+    display: none;
+  }
 }

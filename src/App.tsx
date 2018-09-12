@@ -98,13 +98,33 @@ export default class App extends React.Component<object, State> {
     });
   }
 
+  private displayColumn = (column: object[], idx1: number) => (
+    <div key={idx1} className={`listColumn${column.length === 0 ? " emptyColumn" : ""}`}>
+      {
+        column.map((item: Item, idx: number) => (
+          <SearchResultItem
+            key={idx}
+            location={item.location}
+            address={item.address}
+            email={item.email}
+            phone={item.phone}
+          />
+        ))
+      }
+    </div>
+  )
+
   public render() {
-    const columns: object[][] = [[], [], []];
+    const columns3: object[][] = [[], [], []];
+    const columns2: object[][] = [[], []];
     const results = this.state.results;
     let i: number;
     let j: number;
     for (i = 0; i < 3; i ++) {
-      for (j = i; j < results.length; j += 3) columns[i].push(results[j]);
+      for (j = i; j < results.length; j += 3) columns3[i].push(results[j]);
+    }
+    for (i = 0; i < 2; i++) {
+      for (j = i; j < results.length; j += 2) columns2[i].push(results[j]);
     }
 
     return (
@@ -122,7 +142,7 @@ export default class App extends React.Component<object, State> {
               <div className="filterInputContainer">
                 <span className="filterName">ZIP CODE / POSTAL CODE</span>
                 <input ref={(r) => this.zipInput = r as HTMLInputElement} className="filterInput" type="text" name="radius" id="zip" />
-                <span className="filterLabel">Search Results</span>
+                <span className="filterLabel1">Search Results</span>
               </div>
               <div className="filterInputContainer">
                 <span className="filterName">SELECT RADIUS</span>
@@ -138,27 +158,34 @@ export default class App extends React.Component<object, State> {
               <div className="searchButtonContainer">
                 <div className="searchButton" onClick={this.applyFilter.bind(this)}>Search</div>
               </div>
+              <span className="filterLabel2">Search Results</span>
             </div>
           </div>
 
-          <div className="searchResults">
+          <div className="searchResults-1">
             {
               results.length !== 0 ?
-              columns.map((column: [], idx1: number) => (
-                <div key={idx1} className={`listColumn${column.length === 0 ? " emptyColumn" : ""}`}>
-                  {
-                    column.map((item: Item, idx: number) => (
-                      <SearchResultItem
-                        key={idx}
-                        location={item.location}
-                        address={item.address}
-                        email={item.email}
-                        phone={item.phone}
-                      />
-                    ))
-                  }
-                </div>
-              ))
+              this.displayColumn(results, 0)
+              :
+              <div className="noLocationMsg">
+                No locations available
+              </div>
+            }
+          </div>
+          <div className="searchResults-2">
+            {
+              results.length !== 0 ?
+              columns2.map(this.displayColumn)
+              :
+              <div className="noLocationMsg">
+                No locations available
+              </div>
+            }
+          </div>
+          <div className="searchResults-3">
+            {
+              results.length !== 0 ?
+              columns3.map(this.displayColumn)
               :
               <div className="noLocationMsg">
                 No locations available
